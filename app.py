@@ -37,7 +37,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     video_url = upload_video(
-        video_file="short.mp4",
+        video_file="55.mp4",
         title="Test Shorts Başlığı",
         description="Açıklama burada",
         tags=["shorts", "test"]
