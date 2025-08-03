@@ -34,7 +34,7 @@ def upload_video(video_file, title, description, tags):
 def index():
     return render_template('index.html')
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['GET','POST'])
 def upload():
     video_url = upload_video(
         video_file="55.mp4",
