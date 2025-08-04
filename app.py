@@ -17,10 +17,12 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
+scheduler.start()
+
 scheduled_videos = []
 scheduler = BackgroundScheduler()
 
-scheduler.start()
+
 
 @app.route('/')
 def index():
