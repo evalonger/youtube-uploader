@@ -17,7 +17,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
-scheduler.start()
+
 
 scheduled_videos = []
 scheduler = BackgroundScheduler()
@@ -120,6 +120,7 @@ def kontrol_et_ve_yukle():
         print(f"Kontrol hatası: {str(e)}")
         
 scheduler.add_job(kontrol_et_ve_yukle, 'interval', minutes=1)
+scheduler.start()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
