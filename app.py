@@ -84,6 +84,7 @@ def upload_to_youtube(video_path, title, description, tags):
         body=request_body,
         media_body=media
     ).execute()
+    print(f"[DEBUG] Video yüklendi! Video ID: {response['id']}")
 
     return f"https://youtu.be/{response['id']}"
     
