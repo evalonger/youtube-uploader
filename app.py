@@ -9,6 +9,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import threading
 
+
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'uploads'
@@ -18,6 +19,7 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
 scheduled_videos = []
 scheduler = BackgroundScheduler()
+scheduler.add_job(kontrol_et_ve_yukle, 'interval', minutes=1)
 scheduler.start()
 
 @app.route('/')
@@ -84,6 +86,33 @@ def upload_to_youtube(video_path, title, description, tags):
     ).execute()
 
     return f"https://youtu.be/{response['id']}"
+    
+def kontrol_et_ve_yukle():
+    try:
+        with open("scheduled.json", "r+") as file:
+            data = json.load(file)
+            kalan_videolar = []
+            for item in data:
+                zaman = datetime.strptime(item["publish_datetime"], "%Y-%m-%d %H:%M")
+                if datetime.now() >= zaman:
+                    try:
+                        upload_to_youtube(
+                            item["video_path"],
+                            item["title"],
+                            item["description"],
+                            item["tags"]
+                        )
+                        print(f"Yüklendi: {item['title']}")
+                    except Exception as e:
+                        print(f"Yükleme hatası: {str(e)}")
+                        kalan_videolar.append(item)  # Tekrar denemek için sakla
+                else:
+                    kalan_videolar.append(item)
+            file.seek(0)
+            file.truncate()
+            json.dump(kalan_videolar, file, indent=2)
+    except Exception as e:
+        print(f"Kontrol hatası: {str(e)}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
