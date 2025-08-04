@@ -1,10 +1,14 @@
+
 <!DOCTYPE html>
 <html>
-<head><title>Video Upload</title></head>
+<head><title>Upload</title></head>
 <body>
   <h1>Video Yükle</h1>
   <form method="post" enctype="multipart/form-data">
-    <input type="file" name="video" accept="video/*" required>
+    <input type="file" name="video" required><br><br>
+    <input type="text" name="title" placeholder="Başlık" required><br><br>
+    <textarea name="description" placeholder="Açıklama" required></textarea><br><br>
+    <input type="text" name="tags" placeholder="Etiketler (virgülle ayır)" required><br><br>
     <input type="submit" value="Yükle">
   </form>
 </body>
