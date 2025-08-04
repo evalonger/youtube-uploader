@@ -19,7 +19,7 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 
 scheduled_videos = []
 scheduler = BackgroundScheduler()
-scheduler.add_job(kontrol_et_ve_yukle, 'interval', minutes=1)
+
 scheduler.start()
 
 @app.route('/')
@@ -87,6 +87,7 @@ def upload_to_youtube(video_path, title, description, tags):
 
     return f"https://youtu.be/{response['id']}"
     
+    
 def kontrol_et_ve_yukle():
     try:
         with open("scheduled.json", "r+") as file:
@@ -113,6 +114,8 @@ def kontrol_et_ve_yukle():
             json.dump(kalan_videolar, file, indent=2)
     except Exception as e:
         print(f"Kontrol hatası: {str(e)}")
+        
+scheduler.add_job(kontrol_et_ve_yukle, 'interval', minutes=1)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
