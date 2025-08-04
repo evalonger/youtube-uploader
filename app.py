@@ -5,6 +5,9 @@ from googleapiclient.http import MediaFileUpload
 import os
 import pickle
 from googleapiclient.discovery import build
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime
+import threading
 
 app = Flask(__name__)
 
@@ -12,6 +15,10 @@ UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+
+scheduled_videos = []
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 @app.route('/')
 def index():
@@ -24,15 +31,31 @@ def upload():
         title = request.form['title']
         description = request.form['description']
         tags = request.form['tags'].split(',')
+        publish_date = request.form['publish_date']  # yyyy-mm-dd
+        publish_time = request.form['publish_time']  # HH:MM formatında
 
         video_path = os.path.join(UPLOAD_FOLDER, video.filename)
         video.save(video_path)
 
-        try:
-            youtube_link = upload_to_youtube(video_path, title, description, tags)
-            return f" Video yüklendi! <a href='{youtube_link}' target='_blank'>{youtube_link}</a>"
-        except Exception as e:
-            return f" Hata oluştu: {str(e)}"
+        publish_datetime = datetime.strptime(publish_date + ' ' + publish_time, '%Y-%m-%d %H:%M')
+        
+        scheduled_videos.append({
+            'video_path': video_path,
+            'title': title,
+            'description': description,
+            'tags': tags,
+            'publish_datetime': publish_datetime
+        })
+
+        # Scheduler’a iş ekle
+        scheduler.add_job(
+            func=upload_to_youtube,
+            trigger='date',
+            run_date=publish_datetime,
+            args=[video_path, title, description, tags]
+        )
+        return f"Video planlandı! Yayınlanacak: {publish_datetime}"
+        
 
     return render_template('upload.html')
     
