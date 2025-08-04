@@ -3,6 +3,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import os
+import pickle
+from googleapiclient.discovery import build
 
 app = Flask(__name__)
 
@@ -35,8 +37,8 @@ def upload():
     return render_template('upload.html')
     
 def authenticate_youtube():
-    flow = InstalledAppFlow.from_client_secrets_file("client_secret.json", SCOPES)
-    creds = flow.run_local_server()
+    with open("token.pickle", "rb") as token_file:
+        creds = pickle.load(token_file)
     return build("youtube", "v3", credentials=creds)
 
 def upload_to_youtube(video_path, title, description, tags):
