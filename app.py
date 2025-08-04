@@ -32,30 +32,27 @@ def upload():
         description = request.form['description']
         tags = request.form['tags'].split(',')
         publish_date = request.form['publish_date']  # yyyy-mm-dd
-        publish_time = request.form['publish_time']  # HH:MM formatında
+        publish_time = request.form['publish_time']  # HH:MM
 
         video_path = os.path.join(UPLOAD_FOLDER, video.filename)
         video.save(video_path)
 
-        publish_datetime = datetime.strptime(publish_date + ' ' + publish_time, '%Y-%m-%d %H:%M')
-        
-        scheduled_videos.append({
-            'video_path': video_path,
-            'title': title,
-            'description': description,
-            'tags': tags,
-            'publish_datetime': publish_datetime
-        })
+        publish_datetime = publish_date + ' ' + publish_time
 
-        # Scheduler’a iş ekle
-        scheduler.add_job(
-            func=upload_to_youtube,
-            trigger='date',
-            run_date=publish_datetime,
-            args=[video_path, title, description, tags]
-        )
-        return f"Video planlandı! Yayınlanacak: {publish_datetime}"
+        # Planı scheduled.json'a yaz
+        with open("scheduled.json", "r+") as file:
+            data = json.load(file)
+            data.append({
+                "video_path": video_path,
+                "title": title,
+                "description": description,
+                "tags": tags,
+                "publish_datetime": publish_datetime
+            })
+            file.seek(0)
+            json.dump(data, file, indent=2)
         
+        return f"Video planlandı! Yayınlanacak: {publish_datetime}"
 
     return render_template('upload.html')
     
