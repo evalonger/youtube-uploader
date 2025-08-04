@@ -90,6 +90,7 @@ def upload_to_youtube(video_path, title, description, tags):
     
     
 def kontrol_et_ve_yukle():
+    print(f"[{datetime.now()}] Scheduler çalışıyor, planlanan videolar kontrol ediliyor...")
     try:
         with open("scheduled.json", "r+") as file:
             data = json.load(file)
